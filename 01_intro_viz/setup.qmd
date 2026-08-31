@@ -89,8 +89,8 @@ edu_plot
 #| label: output 
 # verify that we can write a plot out to png & svg
 # use `here` to write in the same folder as this notebook
-ggsave(here::here("01a_intro_viz/edu_stacked_bars.png"), edu_plot, bg = "white")
-ggsave(here::here("01a_intro_viz/edu_stacked_bars.svg"), edu_plot)
+ggsave(here::here("01_intro_viz/edu_stacked_bars.png"), edu_plot, bg = "white")
+ggsave(here::here("01_intro_viz/edu_stacked_bars.svg"), edu_plot)
 ```
 
 ![Exported png](./edu_stacked_bars.png)

@@ -11,28 +11,57 @@ Think about what you need in order to leave the house for work or school. What t
 
 **Things you _always_ need:**
 
-- 
+- Car key
+- Wallet (has my house key inside)
+- Phone
+- Headband
+- Water bottle
 
 **Things you _sometimes_ need**, including what determines whether you need each thing:
 
--
+- Airpods (if I am going on a run or expect to be working from a location outside of my house)
+- Backpack, if I am going to school, or am bringing more than a handful of things with me
+- Tennis bag if I am playing tennis that day
 
 Write it out as pseudocode here, filling in the blanks and adding more fake code:
 
 ``` 
 function leaving_the_house {
-    always_need ___
-    if ___ then bring ___
+    always_need car keys, wallet, phone, headband, water bottle
+    if playing tennis then bring tennis bag
+    elif going on run then bring airpods
+    elif going to school then bring backpack
     otherwise ___
-    
 }
+
+I ended up changing this list, the below one reflects the truth
 ```
 
 From your pseudocode, decide on your arguments and write out a working R function. It should return a list or string giving the things you'll need based on the arguments you give. If you want to get fancy, use some calls to `print` or `cat` to make a nice printout as well.
 
 ```{r}
 #| label: leaving-the-house-definition
-leaving_the_house <- function() {}
+leaving_the_house <- function(day_of_week, driving, activity_list, over_hour) {
+  always_need <- c("Phone")
+  sometimes_need <- c()
+  if ("tennis" %in% activity_list) {
+    sometimes_need <- append(sometimes_need, "Tennis Bag")
+  }
+  if ("run" %in% activity_list) {
+    sometimes_need <- append(sometimes_need, "Airpods")
+  }
+  if (over_hour == TRUE) {
+    sometimes_need <- append(sometimes_need, "Water Bottle")
+  }
+  if (driving == TRUE) {
+    sometimes_need <- append(sometimes_need, "Car Key")
+  }
+  if ("Monday" %in% day_of_week | "Tuesday" %in% day_of_week) {
+    sometimes_need <- append(sometimes_need, "Backpack")
+  }
+  items_to_bring <- c(always_need, sometimes_need)
+  print(c("Items to bring: ", items_to_bring))
+}
 ```
 
 
@@ -40,11 +69,11 @@ Then call your function a few times with different arguments. Start with ones th
 
 ```{r}
 #| label: leaving-the-house-calls 
-today <- leaving_the_house()
+today <- leaving_the_house("Monday", TRUE, c(), TRUE)
 today
 
-tomorrow <- leaving_the_house()
-tomorrow
+wed <- leaving_the_house("Wednesday", FALSE, c("run"), FALSE)
+wed
 ```
 
 
