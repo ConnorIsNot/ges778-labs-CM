@@ -26,25 +26,44 @@ For each chart, jot down the following:
 
 ![Chart 1](./tenure_bars_vert.png)
 
-_Fill in notes here_
+- Bar Chart
+- X-axis is county, y-axis is homeownership
+- Length is the primary encoding
+- These are percentages which are a relative amount
+- x-axis labelling county name, y-axis labelling homeownership percentage, title showing the year
+- Vertical gridlines are not needed
 
 ### Chart 2
 
 ![Chart 2](./tenure_bars_horiz.png)
-
-_Fill in notes here_
+- Bar chart
+- same as above but x and y axis are swapped
+- length
+- relative amounts (percentages)
+- same as above
+- now the horizontal gridlines are unnecessary
 
 ### Chart 3
 
 ![Chart 3](./tenure_dots.png)
 
-_Fill in notes here_
+- Googling tells me this is a strip plot
+- y axis is location name, x axis is home ownership
+- Position is now the primary encoding
+- Relative amounts of percentages
+- same as above, but this time the horizontal and vertical gridlines both feel helpful
+- nothing, imo
 
 ### Chart 4
 
 ![Chart 4](./tenure_box.png)
 
-_Fill in notes here_
+- Boxplot
+- x-axis is homeownership, y-axis is county name
+- length (as in the width of the middle quartiles)
+- relative amounts again, but distribution too i think
+- same as before
+- nothing is unnecessary to me here, i think id like more gridlines for percentages....
 
 ### Chart 5
 
