@@ -69,19 +69,34 @@ For each chart, jot down the following:
 
 ![Chart 5](./unemp_line.png)
 
-_Fill in notes here_
+- Line chart
+- Date on x-axis, unemployment on y-axis, name of region is color
+- not sure if this counts, but the gap between the 2 lines is what stands out to me
+- relative amounts, namely the difference between the values
+- gridlines
+- everything essential
 
 ### Chart 6
 
 ![Chart 6](./unemp_area.png)
 
-_Fill in notes here_
+- area under curve chart maybe?
+- same as above minus an encoding for color
+- the area under the curve
+- relative amounts
+- gridlines again
+- i think the area under curve isn't necessary here, but it does help balance out the chart's values
 
 ### Chart 7
 
 ![Chart 7](./homeownership_income_scatter.png)
 
-_Fill in notes here_
+- I think this is called a bubble plot or a bubble scatter plot.
+- Color is the region name, y axis is homeownership percent, x axis is median household income, size is total number of households I think
+- Position is the primary encoding to me
+- Distribution stands out to me, showing where a range of locations lie along the matrix
+- the legend for household number is helpful
+- everything seems useful here
 
 
 ## Correcting encodings
@@ -121,7 +136,8 @@ acs_balt <- justviz::acs |>
 
 ![Chart 8, original version](./bad_line.png)
 
-_Fill in notes here_
+- this being a line chart implies that there is some sort of change between the counties
+- should be a bar chart or i guess just points
 
 ```{r}
 #| label: chart-8-correction
@@ -130,8 +146,7 @@ _Fill in notes here_
 acs_balt |>
     mutate(datasource = "acs") |>
     ggplot(aes(x = name, y = homeownership, group = datasource)) +
-    geom_line() +
-    scale_x_discrete(labels = scales::label_wrap(10)) +
+    geom_col() +
     scale_y_continuous(labels = scales::label_percent()) +
     labs(title = "Homeownership rate by location, 2024")
 ```
@@ -140,14 +155,21 @@ acs_balt |>
 
 ![Chart 9, original version](./bad_bubble.png)
 
-_Fill in notes here_
+- obviously missing the comparison between baltimore areas vs other maryland counties
+- i dont know if this is an error because i actually think it doesnt impact how the chart is read, but the scale for number of household's lowest end is larger than the smallest values we see so it's hard to know how small those regions are
 
 ```{r}
 #| label: chart-9-correction
 # Hint: compare to chart 7
+helper_var <- justviz::acs |>
+    filter(level == "county")
 justviz::acs |>
     filter(level == "county") |>
-    ggplot(aes(x = median_hh_income, y = homeownership, size = total_hh)) +
+    mutate(balt_area = case_when(
+      name %in% c("Baltimore city", "Baltimore County", "Howard County", "Harford County", "Anne Arundel County") ~ "Balt & Surrounding",
+      TRUE                                              ~ "Other MD Counties"
+    )) |> 
+    ggplot(aes(x = median_hh_income, y = homeownership, size = total_hh, color = balt_area)) +
     geom_point(alpha = 0.8) +
     scale_radius(labels = scales::label_comma(), range = c(1, 10)) +
     scale_x_continuous(labels = scales::label_currency()) +
@@ -161,11 +183,14 @@ justviz::acs |>
 
 ![Chart 10, original version](./bad_stack.png)
 
-_Fill in notes here_
+- these cannot be stacked
 
 ```{r}
 #| label: chart-10-correction
 # reshape data to use color
+  
+    # not sure what this part means? ^^^
+
 # someone please remind Camille to go over this
 cost_burden <- acs_balt |>
     select(name, owner_cost_burden, renter_cost_burden) |>
@@ -177,7 +202,7 @@ cost_burden <- acs_balt |>
     )
 
 ggplot(cost_burden, aes(x = name, y = cost_burden, fill = tenure)) +
-    geom_col(width = 0.8, position = position_stack()) +
+    geom_col(width = 0.8, position = "dodge") +
     scale_fill_manual(values = qual_pal[c(1, 2)]) +
     scale_x_discrete(labels = scales::label_wrap(10)) +
     scale_y_continuous(labels = scales::label_percent()) +
