@@ -185,13 +185,19 @@ comma_vals <- c(2345, 10123.4, 999, 1205) # want 2,345; 10,123; 999; 1,205
 ```{r}
 #| label: fmt-functions-1
 # define functions here
-percent1 <- function(x) {}
+percent1 <- function(x) {
+  paste0(formatC(round(x, digits = 2) * 100, format = "d"), "%")
+}
 percent1(percent_vals)
 
-dollar1 <- function(x) {}
+dollar1 <- function(x) {
+  paste0("$",formatC(round(x, digits = 0), format = "d", big.mark = ",", big.interval = 3))
+}
 dollar1(dollar_vals)
 
-comma1 <- function(x) {}
+comma1 <- function(x) {
+  paste0(formatC(round(x, digits = 0), format = "d", big.mark = ",", big.interval = 3))
+}
 comma1(comma_vals)
 ```
 
