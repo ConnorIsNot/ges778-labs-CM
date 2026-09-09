@@ -1,6 +1,7 @@
 ---
 title: Tables
-format: gfm
+format: html
+tbl-cap-location: top
 ---
 
 This will be a very quick lab where you just practice formatting your data and making a table of it. Not much that isn't already in the notes.
@@ -17,11 +18,57 @@ This will be a very quick lab where you just practice formatting your data and m
 
 ```{r}
 #| label: setup
- 
+library(dplyr)
+library(justviz)
+library(knitr)
+library(scales)
+
+# subsetting the dataset to the USA, MD, and the counties around Anne Arundel. 
+# Selecting focus variables
+acs_anne_around <- justviz::acs |>
+    dplyr::filter(
+        name %in%
+            c(
+                "United States",
+                "Maryland",
+                "Anne Arundel County",
+                "Calvert County",
+                "Prince George's County",
+                "Howard County",
+                "Baltimore County",
+                "Baltimore city"
+            )
+    ) |>
+    dplyr::select(level, name, median_hh_income, no_vehicle_hh, poverty, low_income, diversity_idx)
 ```
 
 
 ```{r}
 #| label: table-with-kable
- 
+
+# setting up scales functions
+
+percent <- scales::label_percent(accuracy = 1)
+dollar <- scales::label_currency(accuracy = 1)
+
+# assigning new values from scales functions
+acs_anne_around_fmt <- acs_anne_around |> 
+  mutate(median_hh_income = dollar(median_hh_income),
+         no_vehicle_hh = percent(no_vehicle_hh),
+         poverty = percent(poverty),
+         low_income = percent(low_income),
+         diversity_idx = percent(diversity_idx)
+         )
+
+kable(acs_anne_around_fmt, col.names = c(
+  "Level",
+  "Name",
+  "Median Household Income",
+  "No Vehicle Households",
+  "Poverty Rate",
+  "Low Income Rate",
+  "Diversity Index"
+),
+align = "llrrrrr",
+caption = "Selected socioeconomic indicators, Anne Arundel and nearby counties, 2024")
 ```
