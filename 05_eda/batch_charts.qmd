@@ -1,0 +1,45 @@
+---
+title: Batch generating charts
+format: gfm
+---
+
+Feel free to ignore this!
+
+By Keaton's request, here are notes on batch generating lots of charts. My usual method is reshape, split, apply: reshape the data into a long format, split into groups (variable, etc), apply a function to each group.
+
+
+```{r}
+#| label: setup
+library(ggplot2)
+
+acs_split <- justviz::acs |>
+    dplyr::filter(level == "tract") |>
+    # reshape, making indicator column a factor
+    tidyr::pivot_longer(
+        -level:-name,
+        names_to = "indicator",
+        names_ptypes = factor()
+    ) |>
+    # split into a list of data frames based on indicator
+    split(~indicator)
+
+# varify that this is a list, that each list item is a data frame,
+# and check the length
+class(acs_split)
+class(acs_split[[1]])
+length(acs_split)
+```
+
+A batch list of 38 histograms
+
+```{r}
+#| label: batch-charts
+# map_* functions map over a list to apply a function
+# imap means it takes 2 arguments, the list item & its index
+# because it's split by a factor, the index is factor levels
+purrr::imap(acs_split, function(df, id) {
+    ggplot(df, aes(x = value)) +
+        geom_histogram(bins = 50) +
+        labs(title = stringr::str_glue("ACS data: {id} by tract"))
+})
+```
