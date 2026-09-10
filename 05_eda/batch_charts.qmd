@@ -43,3 +43,28 @@ purrr::imap(acs_split, function(df, id) {
         labs(title = stringr::str_glue("ACS data: {id} by tract"))
 })
 ```
+
+In base R, you could instead take a vector of column names for the columns you want to plot, then iterate over that with `lapply` (kind of the base equivalent of `purrr::map`). `hist` just needs a vector instead of a whole data frame, so you can subset the data frame for just the vector of interest and plot it.
+
+```{r}
+#| label: base-r
+# get the names of columns other than the ones for geography
+# other ways to do this
+cols <- names(justviz::acs)[
+    names(justviz::acs) %notin% c("level", "name", "county")
+]
+
+# alternatives:
+# select columns programmatically by data type
+# names(justviz::acs)[unlist(lapply(justviz::acs, is.numeric))]
+# drop columns by index
+# names(justviz::acs)[-1:-3]
+
+# assign back to a variable just to avoid printing a bunch of NULLs
+plots <- lapply(cols, function(col) {
+    # extract column as a vector for rows where level == tract
+    col_data <- justviz::acs[[col]][justviz::acs$level == "tract"]
+    hist(col_data, main = col)
+})
+```
+
