@@ -57,7 +57,7 @@ acs_anne_around_fmt <- acs_anne_around |>
          no_vehicle_hh = percent(no_vehicle_hh),
          poverty = percent(poverty),
          low_income = percent(low_income),
-         diversity_idx = percent(diversity_idx)
+         diversity_idx = diversity_idx
          )
 
 kable(acs_anne_around_fmt, col.names = c(
