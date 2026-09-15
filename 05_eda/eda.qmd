@@ -8,26 +8,44 @@ For this lab, you'll do some EDV with the ACS data, taking similar steps to what
 ```{r}
 #| label: setup
 library(ggplot2)
+test_acs <- justviz::acs
 
 acs_tracts <- justviz::acs |>
     dplyr::filter(level == "tract") |>
-    dplyr::select(county, name, NULL) # replace NULL with the columns you want to use
+    dplyr::select(county, name, median_hh_income, no_vehicle_hh, poverty, low_income, diversity_idx)
 ```
 
 Look at the first few rows of data, and print a summary. Jot down anything that seems noteworthy---missing values, very high or low values, etc.
 
+Nothing noteworthy, correct number of unique counties, very few NAs for each.
+
 ```{r}
 #| label: summary
- 
+summary(acs_tracts)
 ```
 
 ## Variation
 
 For each numeric variable in your data, make a histogram. Adjust the number of bins or the binwidths for each one until you find something easy to read and that shows the data well. Again, jot down what you notice about the distributions. 
 
+They all follow distributions with nothing that visually stand out to me, except for median_hh_income, but that was explained in class: the highest bin is so large because ACS just assigns any tracts with a median hh income > \$250,000 as \$250,001.
+No vehicle HH and poverty rate both have extreme skews.
+
 ```{r}
 #| label: histograms
- 
+library(patchwork)
+median_hh_income <- ggplot(acs_tracts, aes(x = median_hh_income)) +
+    geom_histogram(color = "white")
+no_vehicle_hh <- ggplot(acs_tracts, aes(x = no_vehicle_hh)) +
+    geom_histogram(color = "white", binwidth = 0.01)
+poverty <- ggplot(acs_tracts, aes(x = poverty)) +
+    geom_histogram(color = "white")
+low_income <- ggplot(acs_tracts, aes(x = low_income)) +
+    geom_histogram(color = "white")
+diversity_idx <- ggplot(acs_tracts, aes(x = diversity_idx)) +
+    geom_histogram(color = "white")
+median_hh_income + no_vehicle_hh /
+  poverty + low_income + diversity_idx
 ```
 
 ## Unusual values
@@ -36,7 +54,14 @@ For one of your variables with a heavy skew or some extreme values, filter the d
 
 ```{r}
 #| label: extremes
- 
+acs_tracts |>
+    dplyr::filter(no_vehicle_hh < 0.5) |>
+    ggplot(aes(x = no_vehicle_hh)) +
+    geom_histogram(color = "white", binwidth = .01)
+acs_tracts |>
+    dplyr::filter(poverty < 0.5) |>
+    ggplot(aes(x = poverty)) +
+    geom_histogram(color = "white", binwidth = .01)
 ```
 
 
