@@ -13,6 +13,7 @@ Filter the data for just the county you choose. Then further filter, summarize, 
 #| label: setup
 library(ggplot2)
 library(ggpubr)
+library(tidyverse)
 unemp_since_2020 <- justviz::unemployment |>
     dplyr::filter(lubridate::year(date) >= 2020)
 
@@ -50,7 +51,25 @@ General idea you're going for is like this:
 
 ```{r}
 #| label: unemployment-gap
+county_unemp_2025 <- unemp_since_2020 |>
+    filter(name == "Anne Arundel County") |> 
+    filter(lubridate::year(date) == 2025) |> 
+    mutate(rate_estimate = case_when(
+      !is.na(rate) ~ rate,
+      is.na(rate) ~ (abs(lead(rate)+lag(rate)))/2
+    )) #|> 
+  # rename(rate_real = rate) |> 
+  # pivot_longer(cols = c(rate_real, rate_estimate),
+  #              names_to = "validity",
+  #              values_to = "rate")
 
+# okay i tried REALLY hard to make it work without using multiple geom lines but I couldn't
+# I commented out the pivot longer because it didn't serve a purpose if I just did multiple geom_lines
+
+ggplot(county_unemp_2025, aes(x = date, y = rate)) +
+  geom_line(aes(y = rate_estimate), linetype = "dotted", linewidth = 1) +
+  geom_line(aes(y = rate), linetype = "solid", linewidth = 1.1) +
+  geom_point(size = 2)
 ```
 
 ## Distributions vs summaries

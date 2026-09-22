@@ -17,6 +17,20 @@ the misleading story you want.
 ``` r
 library(ggplot2)
 library(ggpubr)
+library(tidyverse)
+```
+
+    ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ✔ dplyr     1.2.1     ✔ readr     2.2.0
+    ✔ forcats   1.0.1     ✔ stringr   1.6.0
+    ✔ lubridate 1.9.5     ✔ tibble    3.3.1
+    ✔ purrr     1.2.2     ✔ tidyr     1.3.2
+    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ✖ dplyr::filter() masks stats::filter()
+    ✖ dplyr::lag()    masks stats::lag()
+    ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 unemp_since_2020 <- justviz::unemployment |>
     dplyr::filter(lubridate::year(date) >= 2020)
 
@@ -80,6 +94,33 @@ hints:
 General idea you’re going for is like this:
 
 ![Unemployment with dashed line](./unemployment_filled.png)
+
+``` r
+county_unemp_2025 <- unemp_since_2020 |>
+    filter(name == "Anne Arundel County") |> 
+    filter(lubridate::year(date) == 2025) |> 
+    mutate(rate_estimate = case_when(
+      !is.na(rate) ~ rate,
+      is.na(rate) ~ (abs(lead(rate)+lag(rate)))/2
+    )) #|> 
+  # rename(rate_real = rate) |> 
+  # pivot_longer(cols = c(rate_real, rate_estimate),
+  #              names_to = "validity",
+  #              values_to = "rate")
+
+# okay i tried REALLY hard to make it work without using multiple geom lines but I couldn't
+# I commented out the pivot longer because it didn't serve a purpose if I just did multiple geom_lines
+
+ggplot(county_unemp_2025, aes(x = date, y = rate)) +
+  geom_line(aes(y = rate_estimate), linetype = "dotted", linewidth = 1) +
+  geom_line(aes(y = rate), linetype = "solid", linewidth = 1.1) +
+  geom_point(size = 2)
+```
+
+    Warning: Removed 1 row containing missing values or values outside the scale range
+    (`geom_point()`).
+
+![](details_files/figure-commonmark/unemployment-gap-1.png)
 
 ## Distributions vs summaries
 
