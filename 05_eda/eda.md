@@ -129,6 +129,16 @@ the x-axis and county on the y-axis, then use `geom_boxplot`. What
 patterns can you see now that were obscured by looking at all tracts in
 the state lumped together?
 
+``` r
+ggplot(acs_tracts, aes(x = no_vehicle_hh, y = county)) +
+  geom_boxplot()
+```
+
+    Warning: Removed 4 rows containing non-finite outside the scale range
+    (`stat_boxplot()`).
+
+![](eda_files/figure-commonmark/boxplots-1.png)
+
 Pick a variable you want to investigate; pretend you’re going to build a
 model to predict this variable (dependent variable). Choose another
 variable that you think could be a feature in your model (independent
@@ -137,9 +147,68 @@ y-axis and your independent variable on the x-axis. If it’s too dense to
 read easily, try different strategies to reduce overplotting. Repeat
 this with 2 more independent variables.
 
+``` r
+ggplot(acs_tracts, aes(y = no_vehicle_hh, x = median_hh_income)) +
+  geom_point() +
+  scale_y_log10() +
+  geom_smooth(method = lm)
+```
+
+    Warning in scale_y_log10(): log-10 transformation introduced infinite values.
+    log-10 transformation introduced infinite values.
+
+    `geom_smooth()` using formula = 'y ~ x'
+
+    Warning: Removed 125 rows containing non-finite outside the scale range
+    (`stat_smooth()`).
+
+    Warning: Removed 8 rows containing missing values or values outside the scale range
+    (`geom_point()`).
+
+![](eda_files/figure-commonmark/scatter-1-1.png)
+
+``` r
+ggplot(acs_tracts, aes(y = no_vehicle_hh, x = poverty)) +
+  geom_point()
+```
+
+    Warning: Removed 4 rows containing missing values or values outside the scale range
+    (`geom_point()`).
+
+![](eda_files/figure-commonmark/scatter-2-1.png)
+
+``` r
+ggplot(acs_tracts, aes(y = no_vehicle_hh, x = diversity_idx)) +
+  geom_point()
+```
+
+    Warning: Removed 4 rows containing missing values or values outside the scale range
+    (`geom_point()`).
+
+![](eda_files/figure-commonmark/scatter-3-1.png)
+
 Now pick one of those independent variables that you think could
 potentially be used in a linear regression model. On your scatterplot,
 add a regression line with `geom_smooth(method = lm)` (see [the
 docs](https://ggplot2.tidyverse.org/reference/geom_smooth.html))
 
+``` r
+ggplot(acs_tracts, aes(y = no_vehicle_hh, x = poverty)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+    `geom_smooth()` using formula = 'y ~ x'
+
+    Warning: Removed 4 rows containing non-finite outside the scale range
+    (`stat_smooth()`).
+
+    Warning: Removed 4 rows containing missing values or values outside the scale range
+    (`geom_point()`).
+
+![](eda_files/figure-commonmark/scatter-lm-1.png)
+
 What does the regression line tell you?
+
+It tells me that the data do indeed follow a linear regression but there
+is a lot of variation in the low values

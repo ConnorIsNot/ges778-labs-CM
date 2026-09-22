@@ -71,33 +71,41 @@ Next, choose one of your numeric variables and make a series of boxplots of it b
 
 ```{r}
 #| label: boxplots
- 
+ggplot(acs_tracts, aes(x = no_vehicle_hh, y = county)) +
+  geom_boxplot()
 ```
 
 Pick a variable you want to investigate; pretend you're going to build a model to predict this variable (dependent variable). Choose another variable that you think could be a feature in your model (independent variable), and make a scatterplot with your dependent variable on the y-axis and your independent variable on the x-axis. If it's too dense to read easily, try different strategies to reduce overplotting. Repeat this with 2 more independent variables.
 
 ```{r}
 #| label: scatter-1
- 
+ggplot(acs_tracts, aes(y = no_vehicle_hh, x = median_hh_income)) +
+  geom_point() +
+  scale_y_log10() +
+  geom_smooth(method = lm)
 ```
 
 ```{r}
 #| label: scatter-2
- 
+ggplot(acs_tracts, aes(y = no_vehicle_hh, x = poverty)) +
+  geom_point()
 ```
 
 ```{r}
 #| label: scatter-3
- 
+ggplot(acs_tracts, aes(y = no_vehicle_hh, x = diversity_idx)) +
+  geom_point()
 ```
 
 Now pick one of those independent variables that you think could potentially be used in a linear regression model. On your scatterplot, add a regression line with `geom_smooth(method = lm)` (see [the docs](https://ggplot2.tidyverse.org/reference/geom_smooth.html))
 
 ```{r}
 #| label: scatter-lm
- 
+ggplot(acs_tracts, aes(y = no_vehicle_hh, x = poverty)) +
+  geom_point() +
+  geom_smooth(method = lm)
 ```
 
 What does the regression line tell you?
 
-
+It tells me that the data do indeed follow a linear regression but there is a lot of variation in the low values
