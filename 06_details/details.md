@@ -134,3 +134,53 @@ good places to start. Try calculating summary statistics in order to use
 functions to show a range. Some interesting examples are in [Wilke’s
 chapter on many
 distributions](https://clauswilke.com/dataviz/boxplots-violins.html).
+
+``` r
+library(patchwork)
+acs_tracts <- justviz::acs |>
+    dplyr::filter(level == "tract") |>
+    dplyr::select(county, name, no_vehicle_hh, poverty) |> 
+    dplyr::filter(county %in% c("Anne Arundel County", "Prince George's County", "Howard County", "Baltimore County", "Calvert County", "Montgomery County"))
+
+car_dense <- ggplot(acs_tracts, aes(x = no_vehicle_hh, fill = county)) +
+  geom_density(alpha = 0.2)
+car_box <- ggplot(acs_tracts, aes(x = no_vehicle_hh, y = county)) +
+  geom_boxplot()
+pov_dense <- ggplot(acs_tracts, aes(x = poverty, fill = county)) +
+  geom_density(alpha = 0.2)
+pov_box <- ggplot(acs_tracts, aes(x = poverty, y = county)) +
+  geom_boxplot()
+car_dense
+```
+
+    Warning: Removed 2 rows containing non-finite outside the scale range
+    (`stat_density()`).
+
+![](details_files/figure-commonmark/distributions-1.png)
+
+``` r
+pov_dense
+```
+
+    Warning: Removed 2 rows containing non-finite outside the scale range
+    (`stat_density()`).
+
+![](details_files/figure-commonmark/distributions-2.png)
+
+``` r
+car_box
+```
+
+    Warning: Removed 2 rows containing non-finite outside the scale range
+    (`stat_boxplot()`).
+
+![](details_files/figure-commonmark/distributions-3.png)
+
+``` r
+pov_box
+```
+
+    Warning: Removed 2 rows containing non-finite outside the scale range
+    (`stat_boxplot()`).
+
+![](details_files/figure-commonmark/distributions-4.png)

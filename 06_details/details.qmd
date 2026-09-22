@@ -78,6 +78,23 @@ Pick 2 variables from the ACS data. Filter for just tracts within 5-7 counties (
 
 ```{r}
 #| label: distributions
- 
+library(patchwork)
+acs_tracts <- justviz::acs |>
+    dplyr::filter(level == "tract") |>
+    dplyr::select(county, name, no_vehicle_hh, poverty) |> 
+    dplyr::filter(county %in% c("Anne Arundel County", "Prince George's County", "Howard County", "Baltimore County", "Calvert County", "Montgomery County"))
+
+car_dense <- ggplot(acs_tracts, aes(x = no_vehicle_hh, fill = county)) +
+  geom_density(alpha = 0.2)
+car_box <- ggplot(acs_tracts, aes(x = no_vehicle_hh, y = county)) +
+  geom_boxplot()
+pov_dense <- ggplot(acs_tracts, aes(x = poverty, fill = county)) +
+  geom_density(alpha = 0.2)
+pov_box <- ggplot(acs_tracts, aes(x = poverty, y = county)) +
+  geom_boxplot()
+car_dense
+pov_dense
+car_box
+pov_box
 ```
 

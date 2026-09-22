@@ -34,5 +34,12 @@ Don't necessarily throw everything into one plot because it will be hard to read
 
 ```{r}
 #| label: scatterplots
- 
+acs_tracts <- justviz::acs |>
+    dplyr::filter(level == "tract") |>
+    dplyr::select(county, name, no_vehicle_hh, poverty) |> 
+    dplyr::filter(county %in% c("Anne Arundel County", "Prince George's County", "Howard County", "Baltimore County"))
+
+ggplot(acs_tracts, aes(x = poverty, y = no_vehicle_hh)) +
+  geom_jitter() +
+  geom_smooth(method = "lm")
 ```
