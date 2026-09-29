@@ -40,6 +40,6 @@ acs_tracts <- justviz::acs |>
     dplyr::filter(county %in% c("Anne Arundel County", "Prince George's County", "Howard County", "Baltimore County"))
 
 ggplot(acs_tracts, aes(x = poverty, y = no_vehicle_hh)) +
-  geom_jitter() +
+  geom_jitter(alpha = 0.3) +
   geom_smooth(method = "lm")
 ```
