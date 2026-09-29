@@ -1,0 +1,94 @@
+---
+title: Text, audience, accessibility
+format: gfm
+---
+
+```{r}
+#| label: setup
+# source formatters script. add any other scripts in your utils folder you have
+source(here::here("utils/formatters.R"))
+library(ggplot2)
+```
+
+## Adding text within a chart
+
+Go back to lab 2 where we defined a function to place labels slightly inward from the end of a bar. Copy and paste that code here. 
+
+```{r}
+#| label: label-nudge-function
+# placeholder---this just returns the input value
+label_nudge <- function(x) {
+    x
+}
+```
+
+Add code to the definition of dental_visit to add 2 new variabled: `nudged_value`, a nudged position for the labels, and `pct_value`, where you've formatted the labels as percentages. Do this either in 1 or 2 `dplyr::mutate` calls. You might want to rewrite the `percent` function that's in the formatters script to fit a different number of decimal places (`accuracy` argument).
+
+If the label placement doesn't look the way you want, add or adjust arguments to your `label_nudge` function until you like the way things are calculated.
+
+```{r}
+#| label: label-nudge-1
+dental_visit <- justviz::cdc |>
+    dplyr::filter(
+        location %in%
+            c(
+                "US",
+                "Maryland",
+                "Baltimore city",
+                "Baltimore County",
+                "Howard County",
+                "Anne Arundel County"
+            )
+    ) |>
+    dplyr::filter(indicator == "Dental visit") |>
+    dplyr::mutate(location = forcats::as_factor(location)) |>
+    dplyr::mutate(value = value / 100) |>
+    # placeholders---change with your own code
+    dplyr::mutate(nudged_value = label_nudge(value)) |>
+    dplyr::mutate(pct_value = value)
+
+ggplot(dental_visit, aes(x = location, y = value)) +
+    geom_col() +
+    geom_text(aes(y = nudged_value, label = pct_value), size = 5)
+```
+
+Does that function work as well when the chart is flipped to horizontal? Adjust arguments of the function and in your `geom_text` call.
+
+```{r}
+#| label: label-nudge-2
+ggplot(dental_visit, aes(x = value, y = location)) +
+    geom_col() +
+    geom_text(aes(x = nudged_value, label = pct_value), size = 5) +
+    # something I learned this week is that this works for discrete scales!
+    coord_cartesian(reverse = "y")
+```
+
+## Audience
+
+Copy over the code for one of your lab 9 charts with your nice theme applied. Imagine you're a consultant to a local government agency (pick one depending on what data is in your chart). Make 2 revisions of your chart:
+
+- One version you'd use to present your research to a meeting of officials from the agency. You can use whatever type of title you want, but it should be at no higher than a 10th grade reading level.
+- One version you'd suggest they use for a public awareness campaign on the issue, such as social media posts, handouts at clinics or government offices, posters on bus shelters, etc. Use narrative titles ("Baltimore County has a higher...") at no higher than a 7th grade reading level.
+
+When you design for each audience, consider your chart type and your use of color, text, and annotations.
+
+Use [wordcalc](https://www.wordcalc.com/readability/) or another online Flesch-Kincaid grade level checker. (On wordcalc, you want the score that says "Flesch-Kincaid Grade Level").
+
+
+For both charts, write alt text that will explain the chart to someone using a screen reader (put it in the `fig-alt` comment). Follow the recommendations from [Amy Cesal's post](https://medium.com/nightingale/writing-alt-text-for-data-visualization-2a218ef43f81?sk=32db60d651933b5ac2c5b6507f3763b5).
+
+
+```{r}
+#| label: chart-agency
+#| fig-alt: ""
+#
+```
+
+
+```{r}
+#| label: chart-public
+#| fig-alt: ""
+#
+```
+
+By the end of this lab, you should have charts that are close to what will get you a good grade on your midterm project!
