@@ -230,17 +230,23 @@ the [Chromatta tool](https://obumbratta.com/chromatta).
 
 ``` r
 # with colorbrewer
-# pal_to_adjust <- RColorBrewer::brewer.pal(n = 3, name = "") # plug in a name here
+pal_to_adjust <- RColorBrewer::brewer.pal(n = 3, name = "Dark2") # plug in a name here
 # or with carto
 # pal_to_adjust <- rcartocolor::carto_pal(n = 3, name = "") # plug in a name here
-# print(pal_to_adjust)
+print(pal_to_adjust)
 ```
+
+    [1] "#1B9E77" "#D95F02" "#7570B3"
 
 In Chromatta, set the number of colors to 5. Make sure correct lightness
 and intelligent interpolation are both switched off. Start with the LAB
 color space selected (first button). Then switch to HSL. What do you
 notice about the transitions between colors and how that changes? What
 about after turning on correct lightness and color interpolation?
+
+- Switching to HSL felt like it “de-muddied” the intermediate colors. It
+  felt like it took the dominant color and turned the saturating up on
+  it. Idk.
 
 Now remove the middle color so you just have the two end points. Switch
 between different color spaces and settings, and check out the sample
@@ -263,17 +269,23 @@ c('#d1eeea', '#a1c7ca', '#74a1ac', '#4c7b90', '#2a5674')
 ```
 
 ``` r
-# pal_chrom <- c() # replace with your palette from chromatta
+pal_chrom <- c('#1b9e77', '#29a4aa', '#3b84b3', '#526db6', '#7570b3') # replace with your palette from chromatta
+# this was the least bad of them, for most of the combinations I tried the middle 3 colors were virtually indistinguishable
 ```
 
 Then use that new palette with `scale_fill_manual` in the chart below.
 
 ``` r
-# ggplot(age, aes(x = name, y = share, fill = group)) +
-#     geom_col(position = position_fill(reverse = TRUE)) +
-#     labs(title = "Population by age group, 2024") +
-#     scale_fill_manual(values = pal_chrom)
+ ggplot(age, aes(x = name, y = share, fill = group)) +
+     geom_col(position = position_fill(reverse = TRUE)) +
+     labs(title = "Population by age group, 2024") +
+     scale_fill_manual(values = pal_chrom)
 ```
+
+![](color_files/figure-commonmark/age-bars-redo-1.png)
 
 Compare it to your previous version of this chart (population by age).
 Which do you like better? What works and doesn’t work with each?
+
+- I like that one end isn’t so light that it is fading into the white
+  background, but I do not like how similar the middle 2 colors are.
