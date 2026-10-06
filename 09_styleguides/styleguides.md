@@ -1,16 +1,29 @@
----
-title: Themes and using a styleguide
-format: gfm
----
+# Themes and using a styleguide
 
-Pick 2 charts of different types from previous labs. Copy & paste the code here. Looking at the styleguide you chose last week, build color palettes and a theme that will replicate aspects of that styleguide. You don't have to adhere to everything; feel free to tweak the colors or other specifications.
+
+Pick 2 charts of different types from previous labs. Copy & paste the
+code here. Looking at the styleguide you chose last week, build color
+palettes and a theme that will replicate aspects of that styleguide. You
+don’t have to adhere to everything; feel free to tweak the colors or
+other specifications.
 https://raw.githubusercontent.com/glosophy/CatoDataVizGuidelines/refs/heads/master/PocketStyleBook.pdf
 
-```{r}
-#| label: copy-old-charts
-
+``` r
 library(tidyverse)
+```
 
+    ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ✔ dplyr     1.2.1     ✔ readr     2.2.0
+    ✔ forcats   1.0.1     ✔ stringr   1.6.0
+    ✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+    ✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+    ✔ purrr     1.2.2     
+    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ✖ dplyr::filter() masks stats::filter()
+    ✖ dplyr::lag()    masks stats::lag()
+    ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 county_unemp_2025 <- justviz::unemployment |>
     filter(lubridate::year(date) >= 2020) |>
     filter(name == "Anne Arundel County") |> 
@@ -24,7 +37,14 @@ ggplot(county_unemp_2025, aes(x = date, y = rate)) +
   geom_line(aes(y = rate_estimate), linetype = "dotted", linewidth = 1) +
   geom_line(aes(y = rate), linetype = "solid", linewidth = 1.1) +
   geom_point(size = 2)
+```
 
+    Warning: Removed 1 row containing missing values or values outside the scale range
+    (`geom_point()`).
+
+![](styleguides_files/figure-commonmark/copy-old-charts-1.png)
+
+``` r
 locations <- c(
     "United States",
     "Maryland",
@@ -48,14 +68,19 @@ ggplot(race, aes(x = name, y = share, fill = group)) +
     geom_col(position = position_fill(reverse = TRUE)) +
     labs(title = "Population by race/ethnicity, 2024") +
     scale_fill_brewer(palette = "Set2")
-
 ```
 
-```{r}
-#| label: setup for plots
- 
-library(showtext)
+![](styleguides_files/figure-commonmark/copy-old-charts-2.png)
 
+``` r
+library(showtext)
+```
+
+    Loading required package: sysfonts
+
+    Loading required package: showtextdb
+
+``` r
 font_add(family = "cato_title", regular = "ITC Franklin Gothic Std Medium.otf")
 font_add(family = "cato_standard", regular = "ITC Franklin Gothic Std Book.otf")
 
@@ -91,9 +116,9 @@ ggplot(mtcars, aes(wt, mpg)) +
   labs(title = "Fuel Efficiency by Vehicle Weight")
 ```
 
-```{r}
-#| label: themed-chart-1
- 
+![](styleguides_files/figure-commonmark/setup%20for%20plots-1.png)
+
+``` r
 ggplot(county_unemp_2025, aes(x = date, y = rate)) +
   geom_line(aes(y = rate_estimate), linetype = "dotted", linewidth = 1, color = "#28223C") +
   geom_line(aes(y = rate), linetype = "solid", linewidth = 1.1, color = "#28223C") +
@@ -105,16 +130,19 @@ ggplot(county_unemp_2025, aes(x = date, y = rate)) +
   )
 ```
 
-The Cato institute suggests not having 5 or more groups, and consoloditating down to 4 or 3, but that isn't realistic for ethnicity data so I am basing my color scheme off the 4 categories implementation and adding a light orange:
-"For four color groups, use dark purple,
-orange, grey, and light purple. Legends
-should be placed at the bottom of the
-chart."
+    Warning: Removed 1 row containing missing values or values outside the scale range
+    (`geom_point()`).
 
+![](styleguides_files/figure-commonmark/themed-chart-1-1.png)
 
-```{r}
-#| label: themed-chart-2
- 
+The Cato institute suggests not having 5 or more groups, and
+consoloditating down to 4 or 3, but that isn’t realistic for ethnicity
+data so I am basing my color scheme off the 4 categories implementation
+and adding a light orange: “For four color groups, use dark purple,
+orange, grey, and light purple. Legends should be placed at the bottom
+of the chart.”
+
+``` r
 ggplot(race, aes(x = name, y = share, fill = group)) +
     geom_col(position = position_fill(reverse = TRUE)) +
     labs(title = "Population by race/ethnicity, 2024") +
@@ -129,3 +157,4 @@ ggplot(race, aes(x = name, y = share, fill = group)) +
 )
 ```
 
+![](styleguides_files/figure-commonmark/themed-chart-2-1.png)
