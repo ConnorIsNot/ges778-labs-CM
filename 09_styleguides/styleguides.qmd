@@ -115,6 +115,8 @@ chart."
 ```{r}
 #| label: themed-chart-2
  
+# make sure to make other category the gray color and also fix the legend to match the style guide
+
 ggplot(race, aes(x = name, y = share, fill = group)) +
     geom_col(position = position_fill(reverse = TRUE)) +
     labs(title = "Population by race/ethnicity, 2024") +

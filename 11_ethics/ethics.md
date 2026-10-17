@@ -1,0 +1,130 @@
+# Ethics & responsible data viz
+
+
+``` r
+library(ggplot2)
+library(stringr)
+```
+
+## Archived data
+
+We’ll get started now working with the EPA’s EJSCREEN data. This was a
+project to assess a variety of environmental hazards and their possible
+disparate impacts on populations the EPA considered socioeconomically
+vulnerable. For each indicator, every tract was given a percentile
+(0-99) for how it ranked compared to tracts across the country. These
+rankings were then scaled based on two demographic indices to bring the
+data into an environmental justice framework. You can find the data for
+Maryland tracts at `justviz::ej_natl`, and read documentation at
+`?justviz::ej_natl`.
+
+Unfortunately, when hundreds of federal datasets were removed in early
+2025, EJSCREEN was one that never went back online. Luckily, backups of
+all the data and documentation are housed in a
+[repo](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/RLR5AX)
+at Harvard Dataverse, including the technical docs. Download the
+[documentation](https://dataverse.harvard.edu/file.xhtml?fileId=10775982&version=4.0)
+(click Access File, then PDF). The main thing you need from the
+technical docs is the summary of environmental indicators on page 15.
+
+Do a little EDA, focused mainly on 2 or 3 indicators. Because of the
+long shape of the data frame, you’ll need to reshape it at some point.
+To start with, I’ll reshape it to get one row per tract and several data
+columns. You might need to reshape again later.
+
+``` r
+ej_subset <- justviz::ej_natl |>
+    # pick different indicators here
+    dplyr::filter(indicator %in% c("pm25", "no2", "lead_paint_exposure", "diesel", "traffic")) |>
+    tidyr::pivot_wider(
+        id_cols = tract,
+        names_from = indicator,
+        values_from = c(value_ptile, d2_ptile, d5_ptile) 
+    )
+
+head(ej_subset)
+```
+
+    # A tibble: 6 × 16
+      tract       value_ptile_pm25 value_ptile_diesel value_ptile_traffic
+      <chr>                  <dbl>              <dbl>               <dbl>
+    1 24001000100                7                 15                  13
+    2 24001000200                6                 28                  19
+    3 24001000500                6                 37                  45
+    4 24001000600                5                 37                  37
+    5 24001000700                5                 40                  35
+    6 24001000800                5                 41                  37
+    # ℹ 12 more variables: value_ptile_lead_paint_exposure <dbl>,
+    #   value_ptile_no2 <dbl>, d2_ptile_pm25 <dbl>, d2_ptile_diesel <dbl>,
+    #   d2_ptile_traffic <dbl>, d2_ptile_lead_paint_exposure <dbl>,
+    #   d2_ptile_no2 <dbl>, d5_ptile_pm25 <dbl>, d5_ptile_diesel <dbl>,
+    #   d5_ptile_traffic <dbl>, d5_ptile_lead_paint_exposure <dbl>,
+    #   d5_ptile_no2 <dbl>
+
+Draft a chart that compares two variables in your reshaped data. Because
+you want to be careful to compare apples to apples, you’ll want to
+compare columns of the same measure type (d2_ptile) *or* for the same
+indicator (pm25). Write up a figure note to accompany the chart. This
+should include:
+
+- The name of the dataset
+- Short definitions of the indicators based on page 15 of the docs
+- Reference to the fact that these are percentiles, not direct rates or
+  percentages
+- A citation for the dataset from Harvard Dataverse (recommended
+  citations are there, as is metadata to use in a citation manager)
+- Acknowledgement of the data being removed from EPA’s website that
+  stays politically neutral
+
+``` r
+ggplot(ej_subset, aes(x = value_ptile_traffic, y = value_ptile_diesel)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = lm) +
+  labs(
+    title = "Tracts that rank highly in traffic also rank highly in diesel emissions.",
+    x = "Traffic Proximity and Volume Percentile",
+    y = "Diesel Particulate Matter Percentile",
+    caption = "Dataset from Environmental Protection Agency EJSCREEEN Environmental Justice Index.\nX-Axis: count of vehicles at major roads within 10 km, divided by distance in km. Y-Axis: Diesel Particulate Matter levels\nValues reflect relative rankings among the comparison area (percentiles)\nSource: EPA, 2024, \"Environmental Justice Mapping and Screening Tool (EJScreen)\", https://doi.org/10.7910/DVN/RLR5AX, Harvard Dataverse, V4.\nDataset removed from EPA servers by DOGE, archived by Harvard Dataverse."
+  ) +
+  theme(
+    plot.caption = element_text(size = 6)
+  )
+```
+
+    `geom_smooth()` using formula = 'y ~ x'
+
+    Warning: Removed 1 row containing non-finite outside the scale range
+    (`stat_smooth()`).
+
+    Warning: Removed 1 row containing missing values or values outside the scale range
+    (`geom_point()`).
+
+![](ethics_files/figure-commonmark/eda-1.png)
+
+## Knowing your role
+
+You have a summer internship doing data visualization for a public
+health agency that serves Baltimore city and Baltimore, Anne Arundel,
+Howard, and Harford Counties. During a heat wave, wildfires start in
+Western Maryland, and heavy smoke begins to drift into the area. The
+agency needs to identify census tracts where people may be at heightened
+risk of health problems related to the smoke so they can do targeted
+outreach.
+
+However, your background is not in public health, and you don’t have a
+clear sense of which way the wind and smoke are traveling. But you find
+a page from AirNow to read about wildfire smoke and public health:
+https://www.airnow.gov/wildfires/when-smoke-is-in-the-air/
+
+You also have some data, namely:
+
+- CDC health data in `justviz::cdc`
+- ACS data in `justviz::acs`
+- Additional ACS data on households’ internet access and workers’
+  commuting methods (“acs_addl.csv” in the same directory as this
+  notebook)
+
+Draft two charts you can present to the outreach team at the agency to
+help them strategize. *Do* put forward what you believe to be
+information that will help them with this, but *do not* try to give
+answers you’re not qualified to give.

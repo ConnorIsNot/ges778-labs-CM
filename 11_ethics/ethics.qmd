@@ -6,6 +6,7 @@ format: gfm
 ```{r}
 #| label: setup
 library(ggplot2)
+library(stringr)
 ```
 
 ## Archived data
@@ -20,11 +21,11 @@ Do a little EDA, focused mainly on 2 or 3 indicators. Because of the long shape 
 #| label: subset
 ej_subset <- justviz::ej_natl |>
     # pick different indicators here
-    dplyr::filter(indicator %in% c("pm25", "no2")) |>
+    dplyr::filter(indicator %in% c("pm25", "no2", "lead_paint_exposure", "diesel", "traffic")) |>
     tidyr::pivot_wider(
         id_cols = tract,
         names_from = indicator,
-        values_from = c(value_ptile, d2_ptile, d5_ptile)
+        values_from = c(value_ptile, d2_ptile, d5_ptile) 
     )
 
 head(ej_subset)
@@ -37,6 +38,23 @@ Draft a chart that compares two variables in your reshaped data. Because you wan
 * Reference to the fact that these are percentiles, not direct rates or percentages
 * A citation for the dataset from Harvard Dataverse (recommended citations are there, as is metadata to use in a citation manager)
 * Acknowledgement of the data being removed from EPA's website that stays politically neutral
+
+```{r}
+#| label: eda
+
+ggplot(ej_subset, aes(x = value_ptile_traffic, y = value_ptile_diesel)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = lm) +
+  labs(
+    title = "Tracts that rank highly in traffic also rank highly in diesel emissions.",
+    x = "Traffic Proximity and Volume Percentile",
+    y = "Diesel Particulate Matter Percentile",
+    caption = "Dataset from Environmental Protection Agency EJSCREEEN Environmental Justice Index.\nX-Axis: count of vehicles at major roads within 10 km, divided by distance in km. Y-Axis: Diesel Particulate Matter levels\nValues reflect relative rankings among the comparison area (percentiles)\nSource: EPA, 2024, \"Environmental Justice Mapping and Screening Tool (EJScreen)\", https://doi.org/10.7910/DVN/RLR5AX, Harvard Dataverse, V4.\nDataset removed from EPA servers by DOGE, archived by Harvard Dataverse."
+  ) +
+  theme(
+    plot.caption = element_text(size = 6)
+  )
+```
 
 ## Knowing your role
 
