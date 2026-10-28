@@ -17,15 +17,15 @@ First, search for an address within Maryland where you want to focus your map (d
 ```{r}
 #| label: center-pt
 # enter the coords inside c() as numbers in the order longitude, latitude
-center_coords <- sf::st_point(x = c())
-center_web_merc <- sf::st_sfc()
+center_coords <- sf::st_point(x = c(-76.50699785012836, 38.9847006352856))
+center_web_merc <- sf::st_sfc(center_coords, crs = 4269)
 ```
 
 Now use `sf::st_transform()` to transform that to a CRS that uses feet and is focused on Maryland (2248). Verify that it has units "ftUS":
 
 ```{r}
 #| label: center-proj
-center_proj <- sf::st_transform()
+center_proj <- sf::st_transform(center_web_merc, crs = 2248)
 center_proj
 ```
 
@@ -33,7 +33,7 @@ Create a buffer of 5 miles around that center point (1 mile = 5280 feet) (feel f
 
 ```{r}
 #| label: buff
-center_buff <- sf::st_buffer(center_proj, dist = 5 * 5280)
+center_buff <- sf::st_buffer(center_proj, dist = 25 * 5280)
 center_buff
 
 # very boring plot
@@ -47,8 +47,9 @@ Use `tigris::tracts` to get tracts for all of Maryland (`justviz::tracts_sf` is 
 #| label: tracts
 tracts_sf <- tigris::tracts(state = "MD", cb = TRUE) |>
   dplyr::select(geoid = GEOID, county = NAMELSADCO)
-counties_sf <- tracts_sf |>
-  # group by counties & summarise
+counties_sf <- tracts_sf |> 
+  dplyr::group_by(county) |> 
+  dplyr::summarise(.groups = "drop")
 
   ggplot(counties_sf) +
   geom_sf()
@@ -58,7 +59,9 @@ Get the intersection of the buffer and the tract shapes. To do this, they'll nee
 
 ```{r}
 #| label: intersection
-buff_reproj <- sf::st_transform(center_buff)
+
+sf::st_crs(tracts_sf)
+buff_reproj <- sf::st_transform(center_buff, crs = 4269)
 tracts_in_buffer <- sf::st_intersection(tracts_sf, buff_reproj)
 tracts_in_buffer
 
@@ -77,7 +80,7 @@ There are a few ways to do this, but we'll make a sparse matrix of which countie
 
 ```{r}
 #| label: intersects
-counties_mask <- sf::st_intersects()
+counties_mask <- sf::st_intersects(counties_sf, buff_reproj)
 counties_mask
 lengths(counties_mask)
 

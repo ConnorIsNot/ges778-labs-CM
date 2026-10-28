@@ -14,21 +14,21 @@ For that last one, it's not a huge deal if you can't get `rmapshaper` installed.
 
 ```{r}
 #| label: setup
-pkgs <- c(
-    "sf", # sf : spatial data :: dplyr : tabular data
-    "osmdata", # batch download data from OpenStreetMap
-    "terra", # sf-friendly raster tools
-    "tigris", # download shapefiles from the Census Bureau TIGER database
-    "rmapshaper", # command line tool to edit geographies
-    "tidyterra" # dplyr functions + ggplot geoms for terra rasters
-)
+# pkgs <- c(
+#     "sf", # sf : spatial data :: dplyr : tabular data
+#     "osmdata", # batch download data from OpenStreetMap
+#     "terra", # sf-friendly raster tools
+#     "tigris", # download shapefiles from the Census Bureau TIGER database
+#     "rmapshaper", # command line tool to edit geographies
+#     "tidyterra" # dplyr functions + ggplot geoms for terra rasters
+# )
 
-install.packages(pkgs)
+# install.packages(pkgs)
 
 # or pak::pkg_install(pkgs) 
 
 # recent update means you should install justviz
-pak::pkg_install("umbc-viz/justviz")
+# pak::pkg_install("umbc-viz/justviz")
 
 library(ggplot2)
 # terra needs to be loaded for some methods to work
