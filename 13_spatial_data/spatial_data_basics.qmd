@@ -8,6 +8,7 @@ format: gfm
 ```{r}
 #| label: setup
 library(tidyverse)
+library(sf)
 ```
 
 Now that you're set up for working with spatial data in R, we'll practice a few common tasks that, all combined, will get you a nice map.
@@ -156,6 +157,9 @@ My example here took 3 calls to `geom_sf`; 3 manual scales, one of which needed 
 #| label: legend
 nearby_tracts <- tracts_sf |>
   dplyr::filter(county %in% nearby_counties$county)
+
+ggplot() +
+  geom_sf(data = nearby_tracts)
 ```
 
 ## Joins
@@ -172,13 +176,15 @@ You should have an `sf` data frame with 182 rows. Once you have that, make a map
 #| label: inner-join
 tracts_with_vacants <- tracts_sf |>
   # join here
-
-  class(tracts_with_vacants)
+  inner_join(justviz::vacants_by_tract, by = 'geoid')
+class(tracts_with_vacants)
 ```
 
 ```{r}
 #| label: vacants-map-1
 
+ggplot() +
+  geom_sf(data = tracts_with_vacants, mapping = aes(fill = n_vacants))
 ```
 
 With that map, you only draw tracts that are included in both data frames, i.e. tracts in Baltimore city that have at least one vacant notice. Now use a left join so you can keep all tract geometries in the city, but attach the data about vacancies to it. Filter the tracts data frame for just Baltimore city, then do your join. 
@@ -192,7 +198,12 @@ balt_sf <- tracts_sf |>
 
 balt_tract_vacants_sf <- balt_sf |>
   # join, replace_na, ifelse
+  left_join(justviz::vacants_by_tract) |> 
+  mutate(n_vacants = replace_na(n_vacants, 0)) |> 
+  mutate(has_vacants = ifelse(n_vacants == 0, "No Vacants", "Has Vacants"))
 
+ggplot() +
+  geom_sf(data = balt_tract_vacants_sf, mapping = aes(fill = has_vacants))
 ```
 
 Repeat that, but this time highlight tracts with more than some certain number of vacants instead of 0. Change the categories you use for `has_vacants` accordingly (e.g. "50+ vacants" / "<50 vacants").
@@ -200,7 +211,13 @@ Repeat that, but this time highlight tracts with more than some certain number o
 ```{r}
 #| label: vacants-map-3
 
+balt_tract_vacants_sf <- balt_sf |>
+  left_join(justviz::vacants_by_tract) |> 
+  mutate(n_vacants = replace_na(n_vacants, 0)) |> 
+  mutate(has_vacants = ifelse(n_vacants >= 25, "25+ Vacants", "<25 Vacants"))
 
+ggplot() +
+  geom_sf(data = balt_tract_vacants_sf, mapping = aes(fill = has_vacants))
 ```
 
 ### Spatial & spatial
@@ -211,7 +228,14 @@ Take your Baltimore city tracts, and do a spatial join with `justviz::vacants_sf
 
 ```{r}
 #| label: spatial-join 
-balt_sf |>
+my_vacants_by_tract <- balt_sf |>
   # join, drop, count
+  st_join(justviz::vacants_sf, left = FALSE) |> 
+  st_drop_geometry()
+
+my_vacants_by_tract |> 
+  group_by(geoid) |> 
+  count()
+count(justviz::vacants_by_tract)
 ```
 
