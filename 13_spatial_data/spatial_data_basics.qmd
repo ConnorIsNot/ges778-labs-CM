@@ -7,7 +7,7 @@ format: gfm
 
 ```{r}
 #| label: setup
-library(ggplot2)
+library(tidyverse)
 ```
 
 Now that you're set up for working with spatial data in R, we'll practice a few common tasks that, all combined, will get you a nice map.
@@ -33,7 +33,7 @@ Create a buffer of 5 miles around that center point (1 mile = 5280 feet) (feel f
 
 ```{r}
 #| label: buff
-center_buff <- sf::st_buffer(center_proj, dist = 25 * 5280)
+center_buff <- sf::st_buffer(center_proj, dist = 20 * 5280)
 center_buff
 
 # very boring plot
@@ -46,7 +46,8 @@ Use `tigris::tracts` to get tracts for all of Maryland (`justviz::tracts_sf` is 
 ```{r}
 #| label: tracts
 tracts_sf <- tigris::tracts(state = "MD", cb = TRUE) |>
-  dplyr::select(geoid = GEOID, county = NAMELSADCO)
+  dplyr::select(geoid = GEOID, county = NAMELSADCO, state = STATE_NAME)
+
 counties_sf <- tracts_sf |> 
   dplyr::group_by(county) |> 
   dplyr::summarise(.groups = "drop")
@@ -97,7 +98,12 @@ My ugly example looks like this:
 
 ```{r}
 #| label: everything
-ggplot()
+ggplot() +
+  geom_sf(data = nearby_counties) +
+  geom_sf(data = tracts_in_buffer, mapping = aes(fill = county)) +
+  scale_fill_brewer(palette = "Set3") +
+  geom_sf(data = center_web_merc) +
+  theme_void()
 ```
 
 
@@ -116,6 +122,15 @@ My example is here. It's chaotic to highlight the different settings you can use
 ```{r}
 #| label: layers
 
+state_sf <- tracts_sf |> 
+  dplyr::group_by(state) |> 
+  dplyr::summarise(.groups = "drop")
+
+ggplot() +
+  geom_sf(data = tracts_sf, mapping = aes(fill = county), size = 0.2, color = "white") +
+  geom_sf(data = counties_sf, fill= NA, size = 1, color = "gray30") +
+  geom_sf(data = state_sf, fill = NA, size = 1.5, color = "black") +
+  theme(legend.position = "none")
 ```
 
 ## Legend hacking
