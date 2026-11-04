@@ -5,7 +5,7 @@ format: gfm
 
 ```{r}
 #| label: setup
-library(ggplot2) 
+library(tidyverse)
 ```
 
 ## Choropleths
@@ -15,13 +15,34 @@ Let's make a choropleth! Pick any of the tract-level data we have available in j
 ```{r}
 #| label: choro-distiller 
  
+tracts_sf <- tigris::tracts(state = "MD", county = c("Howard County","Baltimore City","Baltimore County"),cb = TRUE) |>
+  select(geoid = GEOID, county = NAMELSADCO, state = STATE_NAME)
+
+spatial_ej <- tracts_sf |> 
+  left_join(justviz::ej_natl, by = c("geoid" = "tract")) |> 
+  pivot_wider(names_from = indicator, values_from = c(value_ptile, d2_ptile, d5_ptile))
+
+ggplot() +
+  geom_sf(data = spatial_ej, mapping = aes(fill = value_ptile_pm25)) +
+  scale_fill_distiller(palette = "YlOrRd") +
+  theme_void()
 ```
 
 Study the docs for `scale_fill_distiller` to understand the difference between the brewer, distiller, and fermenter variants (beyond the punny names). Try all three with your data---only 2 of them will work. Decide which you like best for this data. What tradeoffs do you find between legibility and precision?
 
+- Brewer is sequential palettes (well really, any palette with a set number of classes, but in this case I'm assuming sequential)
+- Distiller turns a brewer palette into a continuous palette
+- Fermenter groups continuous values into bins 
+
+I like fermenter the most for this, i really am not a fan of continuous palettes most of the time
+
 ```{r}
 #| label: choro-more-scales 
  
+ggplot() +
+  geom_sf(data = spatial_ej, mapping = aes(fill = value_ptile_pm25)) +
+  scale_fill_fermenter(palette = "YlOrRd") +
+  theme_void()
 ```
 
 ## Binning algorithms
